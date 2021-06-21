@@ -103,7 +103,7 @@ def run(args):
                             val_total += length.sum().item()
                             val_correct += sum(
                                 [(logits.argmax(2)[i][:_] == bios[i][:_]).sum().item() for i, _ in enumerate(length)])
-
+                            
                     val_acc = val_correct / val_total
                     valid_loss = val_loss / len(val_loader.dataset)
                     save_checkpoint({'state_dict': model.state_dict(),
