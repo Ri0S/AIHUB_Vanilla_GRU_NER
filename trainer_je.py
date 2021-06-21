@@ -15,13 +15,13 @@ from tqdm import tqdm
 def save_checkpoint(state, is_best, path):
     torch.save(state, path)
     if is_best:
-        shutil.copy(path, '/'.join(path.split('/')[:-1]) + '/kr_aihub_best_checkpoint_210618.pt')
+        shutil.copy(path, '/'.join(path.split('/')[:-1]) + '/kr_aihub_je_best_checkpoint_210618.pt')
 
 
 def load_checkpoint(args):
     checkpoint = torch.load(args.resume)
 
-    model = Model(num_class=32)
+    model = Model(num_class=4, vocab_size=4563)
     model.load_state_dict(checkpoint['state_dict'])
 
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
@@ -32,17 +32,17 @@ def load_checkpoint(args):
 
 def run(args):
     device = torch.device('cuda')
-    train_set = utils.dataset('train', 20, trunc=args.trunc)
+    train_set = utils.dataset_je('train', 20, trunc=args.trunc)
     train_loader = DataLoader(train_set, batch_size=args.batch_size, pin_memory=True, shuffle=True,
                               collate_fn=utils.collate_fn)
-    val_set = utils.dataset('val')
+    val_set = utils.dataset_je('val')
     val_loader = DataLoader(val_set, batch_size=args.valid_batch_size, pin_memory=True, shuffle=False,
                             collate_fn=utils.collate_fn)
 
     if args.resume:
         model, optimizer = load_checkpoint(args)
     else:
-        model = Model(num_class=32, vocab_size=4563)
+        model = Model(num_class=4, vocab_size=4563)
         optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
 
     model.train()
@@ -59,7 +59,7 @@ def run(args):
 
     while step < args.steps:
         for claims, bios, length in train_loader:
-            
+
             claims = torch.tensor(claims).to(device)
             bios = torch.tensor(bios).to(device)
             length = torch.tensor(length).to('cpu')
@@ -73,14 +73,13 @@ def run(args):
                 total = 0
             optimizer.zero_grad()
             with autocast():
-                
+
                 logits, loss = model(claims, bios, length)
 
                 avg_loss += loss.item()
                 total += length.sum().item()
                 acc += sum([(logits.argmax(2)[i][:_] == bios[i][:_]).sum().item() for i, _ in enumerate(length)])
 
-            
             scaler.scale(loss).backward()
             scaler.step(optimizer)
             scaler.update()
@@ -112,7 +111,7 @@ def run(args):
                                      'valid_acc': val_acc,
                                      'validation_loss': valid_loss,
                                      'optimizer': optimizer.state_dict()}, False if val_acc < best_acc else True,
-                                    './checkpoint/kr_aihub_210618_%d.pt' % step)
+                                    './checkpoint/kr_aihub_je_210618_%d.pt' % step)
                     if val_acc > best_acc:
                         best_acc = val_acc
                 model.train()

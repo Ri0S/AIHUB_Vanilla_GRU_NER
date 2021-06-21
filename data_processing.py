@@ -3,47 +3,49 @@ import os
 
 '''
 bio_just_entity_or_not.txt:
-0: O
-1: I
-2: B
+0: PAD
+1: O
+2: I
+3: B
 
 bio.txt:
-0: O
-1: PERSON(PS) B
-2: PERSON(PS) I
-3: LOCATION(LC) B
-4: LOCATION(LC) I
-5: ORGANIZATION(OG) B
-6: ORGANIZATION(OG) I
-7: ARTIFACTS(AF) B
-8: ARTIFACTS(AF) I
-9: DATE(DT) B
-10: DATE(DT) I
-11: TIME(TI) B
-12: TIME(TI) I
-13 CIVILIZATION(CV) B
-14: CIVILIZATION(CV) I
-15: ANIMAL(AM) B
-16: ANIMAL(AM) I
-17: PLANT(PT) B
-18: PLANT(PT) I
-19: QUANTITY(QT) B
-20: QUANTITY(QT) I
-21: STUDY_FIELD(FD) B
-22: STUDY_FIELD(FD) I
-23: THEORY(TR) B
-24: THEORY(TR) I
-25: EVENTY(EV) B
-26: EVENT(EV) I
-27: MATERIAL(MT) B
-28: MATERIAL(MT) I
-29: TERM(TM) B
-30: TERM(TM) I
+0: PAD
+1: O
+2: PERSON(PS) B
+3: PERSON(PS) I
+4: LOCATION(LC) B
+5: LOCATION(LC) I
+6: ORGANIZATION(OG) B
+7: ORGANIZATION(OG) I
+8: ARTIFACTS(AF) B
+9: ARTIFACTS(AF) I
+10: DATE(DT) B
+11: DATE(DT) I
+12: TIME(TI) B
+13: TIME(TI) I
+14 CIVILIZATION(CV) B
+15: CIVILIZATION(CV) I
+16: ANIMAL(AM) B
+17: ANIMAL(AM) I
+18: PLANT(PT) B
+19: PLANT(PT) I
+20: QUANTITY(QT) B
+21: QUANTITY(QT) I
+22: STUDY_FIELD(FD) B
+23: STUDY_FIELD(FD) I
+24: THEORY(TR) B
+25: THEORY(TR) I
+26: EVENTY(EV) B
+27: EVENT(EV) I
+28: MATERIAL(MT) B
+29: MATERIAL(MT) I
+30: TERM(TM) B
+31: TERM(TM) I
 '''
 
 
-entity_dict = {'PS': 2, 'LC': 4, 'OG': 6, 'AF': 8, 'DT': 10, 'TI': 12, 'CV': 14, 'AM': 16, 'PT': 18, 'QT': 20,
-               'FD': 22, 'TR': 24, 'EV': 26, 'MT': 28, 'TM': 30}
+entity_dict = {'PS': 3, 'LC': 5, 'OG': 7, 'AF': 9, 'DT': 11, 'TI': 13, 'CV': 15, 'AM': 17, 'PT': 19, 'QT': 21,
+               'FD': 23, 'TR': 25, 'EV': 27, 'MT': 29, 'TM': 31}
 
 with open('./itos_cased.txt', encoding='utf-8') as f:
     itos = [_.replace('\n', '').replace('\r', '') for _ in f]
@@ -73,8 +75,8 @@ with open('data/val_emjeol_input_cased.jsonl', 'w', encoding='utf-8') as f, \
                         missing.add(_)
                         tokens.append(1)
 
-                bio_jen = [0 for _ in range(len(data['text']))]
-                bio = [0 for _ in range(len(data['text']))]
+                bio_jen = [1 for _ in range(len(data['text']))]
+                bio = [1 for _ in range(len(data['text']))]
                 try:
                     for entity in data['NE']:
                         if data['text'][entity['begin']:entity['end']] != entity['entity']:
